@@ -5,13 +5,8 @@
 **Purchase-Aware Household Orchestration for Proactive Home Preparation**
 
 **Hanyang University · Fall 2026**  
-`CSE406-SW-Projects-2026` · `ITE351-AI-Projects-2026`
+`CSE406` · `ITE351`
 
-Settle is a university project exploring how a smart home can prepare for incoming purchases before the user has to manually configure routines. A user-shared order is converted into structured items, combined with bounded household context, compared with similar purchase-intent cases, and interpreted to determine whether the home has any meaningful work to do.
-
-The current direction is intentionally conservative about action scope. **Most orders should result in no home action.** Language models may support extraction, intent reasoning, and task proposal, while deterministic software and the home-side execution layer retain authority over device capabilities, safety constraints, execution, and feedback. Observed outcomes can later become household memory for future episodes.
-
-> **Project status:** Academic prototype and proposed architecture. Settle is not an official LG Electronics product and does not claim production access to LG ThinQ appliance-control interfaces.
 
 ## ITE 351: AI & Applications — Group Project Proposal
 
@@ -20,7 +15,7 @@ The current direction is intentionally conservative about action scope. **Most o
 | **Name** | **Organization** | **Email** |
 | --- | --- | --- |
 | Jeewon Lee | Department of Information Systems, Hanyang University | leejeewon916@gmail.com |
-| Uijin Lee | Department of Information Systems, Hanyang University | smilelejn@gmail.com |
+| Uijin Lee | Department of Information Systems, Department of Food & Nutrition Hanyang University | smilelejn@gmail.com |
 | Seojin Lee | Department of Information Systems, Hanyang University | leeseojini0303@gmail.com |
 | Yejoon Kim | Department of Information Systems, Hanyang University | yejoonkim1340@gmail.com |
 
@@ -87,4 +82,4 @@ The project has completed its initial problem framing and requirements work and 
 
 Settle is an academic prototype. Synthetic data is used to explore cold-start knowledge construction and does not establish real household frequency or user preference. AI-generated labels and judgments require validation. Real LG appliance integration may be replaced by clearly labeled simulation where interfaces are unavailable. High-risk, irreversible, or money-spending actions are outside the intended autonomous-action scope.
 
-*LG, ThinQ, and ThinQ ON are trademarks of their respective owners. This project is an independent academic project conducted in an LG-related course context.*
+

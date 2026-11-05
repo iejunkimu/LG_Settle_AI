@@ -1,0 +1,230 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% Based on the IEEE conference template supplied for CSE 406.
+% Team metadata reflects the role discussion recorded on 2026-10-21.
+% Revision 2 (2026-10-30): propagates the 2026-10-29 team semantic decisions.
+% Layout pass: four authors in one row, readable roles, and balanced final columns.
+% See revision-2026-10-30.md for decision-to-clause traceability.
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{newtxtext,newtxmath}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tabularx}
+\usepackage{flafter}
+\usepackage{balance}
+\usepackage{needspace}
+
+% Keep a requirement heading with the first lines without reserving a whole block.
+\clubpenalties 3 10000 10000 0
+\newcommand{\req}[1]{\par\addvspace{3pt}\noindent\textbf{#1}}
+\begin{document}
+
+\title{Settle: Purchase-Aware Household Orchestration for Proactive Home Preparation}
+
+\author{
+\IEEEauthorblockN{Jeewon Lee}
+\IEEEauthorblockA{\small\textit{Dept. of Information Systems}\\
+\textit{Hanyang University}\\
+Seoul, Republic of Korea\\
+leejeewon916@gmail.com}
+\and
+\IEEEauthorblockN{Uijin Lee}
+\IEEEauthorblockA{\small\textit{Dept. of Information Systems}\\
+\textit{Dept. of Food \& Nutrition}\\
+\textit{Hanyang University}\\
+Seoul, Republic of Korea\\
+smilelejn@gmail.com}
+\and
+\IEEEauthorblockN{Seojin Lee}
+\IEEEauthorblockA{\small\textit{Dept. of Information Systems}\\
+\textit{Hanyang University}\\
+Seoul, Republic of Korea\\
+leeseojini0303@gmail.com}
+\and
+\IEEEauthorblockN{Yejoon Kim}
+\IEEEauthorblockA{\small\textit{Dept. of Information Systems}\\
+\textit{Hanyang University}\\
+Seoul, Republic of Korea\\
+yejoonkim1340@gmail.com}
+}
+
+% The added course line occupies part of IEEEtran's existing post-author space.
+\IEEEaftertitletext{\vspace{-\baselineskip}{\centering\footnotesize
+CSE 406 Software Engineering --- Team Settle\par}\vspace{0.5em}}
+\maketitle
+
+\begin{abstract}
+Online delivery brings products to the door, but it does not prepare the home for what those products require or for a household situation that the order may indicate. Users must still decide how unfamiliar food, clothing, and furniture should be handled and must separately coordinate appliances before occasions such as a child's birthday party. We propose \emph{Settle}, a purchase-aware household orchestration service that converts a shared order into a bounded household episode. Settle extracts items from an order image, attaches relevant calendar and household context, identifies item-level support needs and action-relevant household situations, derives household needs and feasible appliance and Internet-of-Things tasks, and executes only code-verified actions within current authorization and safety boundaries. Explicit user feedback and bounded observations inform household memory. The system is intentionally quiet: no action is a valid result, initial preparation plans require plan-level authorization, and repeated confirmation of similar situations may allow later preparation with fewer questions. Every automation remains explainable and overrideable. The initial prototype will demonstrate a child's birthday-party episode using real devices and clearly labeled simulations. This document defines the responsibilities and boundaries that later specification, architecture, implementation, and evaluation must satisfy.
+\end{abstract}
+
+\begin{IEEEkeywords}
+smart home, household situation, household context, large language models, appliance orchestration, personalization
+\end{IEEEkeywords}
+
+\begin{table}[!t]
+\caption{Role Assignments (Until Midterm)}
+\label{tab:roles}
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\columnwidth}{@{}>{\raggedright\arraybackslash}p{0.22\columnwidth}>{\raggedright\arraybackslash}p{0.22\columnwidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Role} & \textbf{Name} & \textbf{Task description}\\
+\midrule
+User & Uijin Lee & Tests order sharing, explanations, alerts, and the demo; provides usability and acceptance feedback.\\
+Customer & Seojin Lee & Represents client needs, defines objectives and scope, reviews scenarios, and approves requirement coverage.\\
+Software developer & Yejoon Kim & Implements LLM judgment, backend and database, event processing, device adapters, and tests.\\
+Development manager & Jeewon Lee & Manages schedule, task allocation, meeting records, requirements, and project documents.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Introduction}
+
+\subsection{Motivation}
+
+A delivery service solves transportation, not household preparation. After an order arrives, the user still has to decide how each item should be stored, treated, or used. The same strawberry should be handled differently when it is an ordinary grocery item and when it is intended for decorating cupcakes at a birthday party. A new mattress may require temporary ventilation, while a delicate garment may create a loss if it is placed in the wrong drying cycle. These decisions are small individually, but they accumulate at the exact time when online shopping is supposed to reduce effort.
+
+A second burden appears when several purchased items indicate a future occasion. Buying party decorations, children's tableware, cupcake ingredients, and drinks can support an interpretation of a household situation. Users must translate that situation into separate actions such as cleaning before guests arrive, preparing child-safety settings, changing lighting and media, and placing an oven in a ready state. Existing smart-home routines can automate these actions only after the user has already recognized the situation and configured the corresponding rules. Settle undertakes both item-level management, handling guidance, and loss prevention, and situation-driven home preparation; an item can require support without belonging to a special occasion.
+
+\subsection{Problem Statement}
+
+Current services stop at separate boundaries. Commerce systems know what was ordered but generally do not observe how the order is used inside the home. Delivery tracking and entrance cameras stop at the door. Appliance applications know device state, but not why a set of incoming products matters. Rule-based smart-home platforms can execute a predetermined trigger-action pair, but the user must author the rule before the occasion occurs.
+
+The missing responsibility is a bounded decision process that connects an incoming order to household context, determines whether individual items or an action-relevant household situation create meaningful work, derives appropriate needs and tasks, and performs only feasible and currently authorized actions. Explicit feedback and bounded observations may inform later preparation without automatically becoming confirmed preference or new execution authority. Three risks must be controlled: over-interpreting ordinary orders, producing impossible or unsafe device commands, and turning convenience into intrusive automation.
+
+\subsection{Proposed Solution}
+
+Settle treats one shared order as one episode:
+
+\begin{quote}
+order extraction $\rightarrow$ context assembly $\rightarrow$ item and situation interpretation $\rightarrow$ household needs $\rightarrow$ tasks $\rightarrow$ plan authorization $\rightarrow$ execution $\rightarrow$ observation and memory.
+\end{quote}
+
+The large language model (LLM) is used for structured extraction, situation reasoning, and task proposals. Code owns retrieval, evidence checks, capability checks, authorization, state transitions, execution, and memory updates. Personalization comes from retrieved household history rather than training a separate model for each household. ``No action'' is a normal result.
+
+An evidence-supported situation interpretation may guide need and task generation as a hypothesis before user confirmation. Evidence support does not authorize execution. Initially, Settle requests approval for the preparation plan as a whole. Repeated confirmation of the same kind of situation may permit fewer questions or an automated stage within the repeatedly confirmed scope; similarity and transition rules belong to later specification. Quiet execution remains subject to current authorization, registered capabilities, and safety policy.
+
+\subsection{Representative Scenario and Prototype Scope}
+
+The first end-to-end scenario is a child's birthday party. The order contains pink and purple balloons, a princess cake topper, party hats, cupcake mix, icing pens, strawberries, cream, juice, disposable tableware, detergent, and lotion. A calendar event identifies the birthday time; the order provides evidence supporting an interpretation of a princess theme, visiting children, and a cupcake activity. Routine detergent and lotion remain outside the birthday situation bundle; either could still receive independent item-level support when needed. Within an authorized plan, Settle should display relevant food-handling guidance, clean before guests arrive, enable a bounded child-safety mode, configure visual and lighting atmosphere when the first guest arrives, and prepare the oven setting without remotely starting the oven.
+
+The demonstration is intentionally narrow. A five-minute presentation should show the decision path and the household effect, not a general solution for every possible purchase. The prototype may combine real entrance sensing, a phone, a smart light, and a smart plug with simulated LG appliances. Every surface must distinguish real integration from simulation.
+
+\subsection{Related Software and Research}
+
+Shopping-mission research shows that baskets can represent a purpose rather than merely a set of categories \cite{shopping}. Bundle recommendation work formalizes the task of separating intent-related products from unrelated products in the same shopping session \cite{bundle}, while AICL uses LLM examples and correction steps for bundle generation \cite{aicl}. COSMO demonstrates that large-scale commerce systems can operationalize purchase-intent knowledge, although its goal is recommendation rather than household action \cite{cosmo}.
+
+Settle extends these directions in three ways. First, it adds calendar and household history to the order. Retrieval-augmented personalization is motivated by LaMP, which selects relevant user records as prompt context \cite{lamp}. Second, it connects an inferred household situation through household needs to device actions; Sasha studies goal-oriented smart-home planning \cite{sasha}. Settle's primary inference target is an action-relevant household situation, rather than the user's hidden purchase motivation. Third, it does not give the LLM execution authority. HomeBench shows that LLMs can fail on invalid multi-device instructions, motivating a deterministic capability and safety gate \cite{homebench}. Settle reuses explicit feedback and post-purchase observations in later episodes while keeping that evidence separate from execution authority.
+
+\section{Requirements}
+
+The requirements are organized by the responsibility chain of one Settle episode. Each block states a product obligation rather than fixing a replaceable implementation choice. Terms such as threshold, model vendor, database, and device protocol will be finalized in the specification and design documents.
+
+\subsection{Household Setup and Order Intake}
+
+\req{Household Capability Registration.}
+The system shall allow an authorized household user to register connected appliances, Internet-of-Things devices, rooms, calendars, and supported device actions. Each device action shall include its controllable range, safety restrictions, room, and whether it is reversible. The user shall be able to pause Settle or disconnect a source at any time. The initial prototype shall support a bounded set of devices required by the representative scenario.
+
+\req{User-Controlled Order Sharing.}
+The system shall accept an order-completion screenshot or equivalent user-provided order record through a mobile sharing flow. A future commerce-data integration may replace this manual input, but it shall not be required for the initial prototype. Duplicate orders shall not create duplicate episodes.
+
+\req{Structured Order Extraction.}
+For each shared order, the system shall extract item names, quantities, arrival information, product groups, and explicit attributes into a structured record. An attribute shall be retained only when it is supported by visible order text or approved product metadata. Sensitive item titles shall be removed or generalized before downstream reasoning, and the source image shall be deleted after extraction unless the user explicitly retains it.
+
+\subsection{Context and Situation Responsibilities}
+
+\req{Bounded Household Context Assembly.}
+The system shall attach only context relevant to the current episode: normal purchase patterns, nearby calendar tags, similar confirmed household episodes, applicable handling memory, registered capabilities, and a summarized aggregate of eligible cross-household examples. Raw calendar text, unrelated history, and individual records from other households shall not be exposed to the situation model. The exact context used for a decision shall be preserved for explanation and repeatable evaluation.
+
+\req{Item Support and Situation Identification.}
+The system shall separately determine whether individual items require device-based management, handling guidance, or loss-prevention support, and whether some, all, or none of the ordered items and relevant context support an action-relevant household situation. It shall return the selected and excluded items, a bounded situation category, relevant attributes, alternative interpretations, and supporting evidence. ``No relevant situation'' shall be a normal result. Items outside a situation bundle shall remain eligible for independent item-level support.
+
+\req{Evidence Check and Plan Authorization.}
+The system shall verify that a situation interpretation is supported by the assembled evidence before using it as a hypothesis for household-need and task generation. Unsupported interpretations shall produce no situation-based action or a clarification request. Evidence support and situation confirmation shall not by themselves authorize execution. Initial preparation plans and actions outside an established authorization scope shall require plan-level approval. The request shall summarize the interpretation and proposed actions and offer rejection. An unanswered request shall not be repeated for the same order and shall not grant authorization.
+
+\subsection{Task and Plan Responsibilities}
+
+\req{Need-First Household Task Generation.}
+For a confirmed or sufficiently supported situation, the system shall first describe the household need and only then map that need to available device actions within Settle's agreed responsibilities. A proposed task is valid only when it changes device state or prevents a material handling error. An unavailable capability shall not be invented. Zero generated tasks shall be treated as a valid outcome. Task generation shall not itself authorize execution.
+
+\req{Item Handling Guidance.}
+The system shall provide handling guidance only when an avoidable mistake may cause loss, when the purchase situation changes the normal handling method, or when a required preparation step is not obvious. These conditions may apply to routine items outside a situation bundle. Previously acknowledged guidance shall be suppressed unless the item, situation, or relevant condition changes it. The initial scenario shall distinguish party-specific strawberry and cream handling from ordinary grocery storage.
+
+\req{Deterministic Plan Validation.}
+Every proposed action shall pass a code-side validation gate before confirmation or execution. The gate shall check device existence, supported command, value range, room, quiet hours, reversibility, current conflicts, and prohibited actions. Settle shall not automatically start high-risk cooking or washing operations, even with plan approval. In the prototype, the oven may receive a standby setting and the induction cooktop may be locked, but Settle shall not start either appliance.
+
+\req{Plan Versioning and Conflict Resolution.}
+A material change to the user's answer, calendar event, or device availability shall create a new plan version and pause affected pending tasks for reevaluation. Unaffected work may continue. A task may resume without new plan-level approval only if it remains the same task within the existing authorization scope; materially changed actions or authority require renewed approval. When two active episodes compete for the same device and time, the system shall merge equivalent actions or select one according to an explicit priority policy. The decision and cancellation reason shall remain visible in the episode log.
+
+\subsection{Execution and Recovery Responsibilities}
+
+\req{Event-Driven, State-Aware Execution.}
+The system shall execute a task only when it is currently authorized and its registered trigger occurs, such as order intake, package bring-in, a scheduled preparation time, guest arrival, event end, or a device event. Repeated confirmation of the same kind of situation may allow later automation within the repeatedly confirmed scope; similarity and transition rules shall be defined in the specification. Immediately before execution, the system shall re-check authorization, device availability, current human use, recent manual action, and quiet-hour constraints. Duplicate events shall be idempotent.
+
+\req{Verification, Override, and Restoration.}
+After issuing a device command, the system shall read the resulting state and record success or failure. A user manual change shall take precedence and shall prevent Settle from immediately overwriting the user. Temporary environmental and protection settings shall save the previous state and may be automatically restored or released when a user-agreed episode end condition is satisfied, unless a user has changed that state in the meantime. Failures that could cause material loss shall be converted to timely user guidance; noncritical failures shall be logged without repeated alerts.
+
+\Needspace{6\baselineskip}
+\subsection{Observation and Household Memory}
+
+\req{Bounded Outcome Observation.}
+The system shall observe only the device and sensor signals needed to evaluate an active episode, within a defined observation window. It shall compare these signals with the household baseline and exclude Settle's own actions from that baseline. Indoor general-purpose cameras, wearables, and per-item tracking tags are outside the initial scope.
+
+\req{Evidence-Based Household Memory.}
+When an episode closes, the system shall store a compact relationship among the interpreted situation, executed tasks, explicit user feedback, and observed outcome. Confirmed situations and conditions may serve as evidence for later interpretation, and direct corrections shall affect the next relevant preparation without model retraining. Unconfirmed observations may serve as weaker predictive evidence, not confirmed preference; weighting and accumulation rules shall be defined in the specification. Memory alone shall not expand execution authority. A household shall be able to inspect and delete its stored memory.
+
+\subsection{Interaction, Privacy, and Demonstration Quality}
+
+\req{Quiet and Explainable Interaction.}
+The system shall contact the user only for necessary interpretation clarification or plan-level authorization, a time-sensitive loss-prevention warning, or selected item-handling guidance. Repeated confirmation may reduce later authorization requests within the applicable authorization scope. Routine task starts and completions shall remain silent. For every episode, a ``Why?'' view shall show the order evidence, household context categories, inferred situation, planned actions, validation decisions, execution outcome, and whether each device was real or simulated.
+
+\balance
+\req{Safety and User Authority.}
+All automation shall be pauseable, overrideable, and bounded jointly by code-side safety policy and current authorization. An interpretation, evidence score, or model response alone shall never authorize device execution. Prohibited actions and authorization boundaries shall be covered by automated tests.
+
+\req{Privacy and Data Minimization.}
+The system shall minimize collection, separate household-private records from aggregate statistics, generalize sensitive item data, and restrict context to the current episode. The user shall be able to predefine permitted data types, purposes, and storage/reuse scope. Standing permission shall permit continued use only within that scope and may be withdrawn at any time; connection alone shall not imply unrestricted data authority. Cross-household information shall be used only in aggregated or synthetic form for the prototype.
+
+\req{Responsiveness and Reliability.}
+Order sharing shall return an initial interpretation within a practical interactive delay, while device triggers shall be processed quickly enough for the scenario they control. Exact latency targets will be fixed after a prototype measurement. Episode and command processing shall tolerate retries without duplicated actions.
+
+\req{Evaluability.}
+The prototype shall record enough structured data to evaluate item extraction, situation identification accuracy (including the no-relevant-situation result), bundle precision, invalid-task rejection, unnecessary-question rate, user overrides, execution success, and scenario completion. Synthetic data may test controlled memory growth, but it shall not be presented as evidence of real household adoption or real-world accuracy.
+
+\req{Demonstration Boundary.}
+Implementation effort shall prioritize the birthday-party episode and one or two small contrast cases. Real devices and simulations shall be labeled on every relevant interface and in the presentation. Capabilities that depend on unavailable LG interfaces shall be described as assumptions or simulated paths rather than completed integrations.
+
+\begin{thebibliography}{00}
+
+\bibitem{shopping}
+P. Sarantopoulos, A. Theotokis, K. Pramatari, and G. Doukidis, ``Shopping missions: An analytical method for the identification of shopper need states,'' \emph{Journal of Business Research}, vol. 69, no. 3, pp. 1043--1052, 2016.
+
+\bibitem{bundle}
+Z. Sun, J. Yang, K. Feng, H. Fang, X. Qu, and Y. S. Ong, ``Revisiting bundle recommendation,'' in \emph{Proc. 45th Int. ACM SIGIR Conf. Research and Development in Information Retrieval}, 2022, pp. 2443--2447.
+
+\bibitem{aicl}
+Z. Sun, K. Feng, J. Yang, X. Qu, H. Fang, Y.-S. Ong, and W. Liu, ``Adaptive in-context learning with large language models for bundle generation,'' in \emph{Proc. 47th Int. ACM SIGIR Conf. Research and Development in Information Retrieval}, 2024.
+
+\bibitem{cosmo}
+C. Yu, X. Liu, J. Maia, \emph{et al.}, ``COSMO: A large-scale e-commerce common sense knowledge generation and serving system at Amazon,'' in \emph{Companion Proc. 2024 Int. Conf. Management of Data}, 2024.
+
+\bibitem{lamp}
+A. Salemi, S. Mysore, M. Bendersky, and H. Zamani, ``LaMP: When large language models meet personalization,'' in \emph{Proc. 62nd Annual Meeting of the Association for Computational Linguistics}, 2024, pp. 7370--7392.
+
+\bibitem{sasha}
+E. King, H. Yu, S. Lee, and C. Julien, ``Sasha: Creative goal-oriented reasoning in smart homes with large language models,'' \emph{Proc. ACM Interactive, Mobile, Wearable and Ubiquitous Technologies}, vol. 8, no. 1, 2024.
+
+\bibitem{homebench}
+S. Li, Y. Guo, J. Yao, Z. Liu, and H. Wang, ``HomeBench: Evaluating LLMs in smart homes with valid and invalid instructions across single and multiple devices,'' in \emph{Proc. 63rd Annual Meeting of the Association for Computational Linguistics}, 2025, pp. 12230--12250.
+
+\end{thebibliography}
+
+\end{document}

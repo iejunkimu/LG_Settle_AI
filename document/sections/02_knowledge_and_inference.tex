@@ -1,0 +1,57 @@
+\section{Knowledge Retrieval and Purchase-Intent Inference}
+\label{sec:inference}
+
+\subsection{Inference inputs}
+
+Service extracts structured items and attributes from the shared order and
+assembles the context needed for intent judgment. This context may include
+purchase-history signals, available calendar tags or temporal context, and
+retrieved purchase-intent evidence. Execution-time device state, the device
+catalog, and own-home execution memory are handled at their respective later
+boundaries unless a further specification explicitly admits them as intent
+evidence. \sourcecite{draft}
+
+\subsection{Knowledge Base--Service contract}
+
+The Knowledge Base stores generated purchase-intent cases and permitted
+actual cases. Service queries for similar cases and receives a distribution
+and representative evidence for runtime judgment and explanation. The
+decision-time retrieval result preserves the following meanings.
+
+\begin{itemize}
+  \item The retrieval population used for the judgment.
+  \item Intent and label identity associated with the returned evidence.
+  \item Representative cases supporting the judgment.
+  \item Provenance sufficient to reproduce the decision-time explanation.
+\end{itemize}
+
+These are shared information requirements. Exact serialized case fields,
+receiver interpretation, and schema details remain under discussion.
+\sourcecite{draft}
+
+\open{Synthetic generation sources differ between joint full-case generation
+and intent-seeded assembly. The shared draft preserves this conflict for a
+team decision.}
+
+\open{The mapping of generation-time confidence and ambiguity metadata into
+the runtime case schema, including how Service receives and interprets that
+metadata, remains unresolved.}
+
+\subsection{Runtime judgment and task handoff}
+
+Service performs one runtime purchase-intent judgment using the structured
+order/context and retrieved evidence. Current semantics use structural and
+format validation around that judgment. The resulting intent or no-intent
+outcome is handed to the preparation stage. The baseline permits ordinary
+shopping and previously rejected household situations to suppress preparation.
+\sourcecite{draft}\sourcecite{baseline}
+
+\open{Adoption of a runtime evidence or confidence threshold as an execution
+gate requires a team decision. Offline dataset-quality thresholds and
+runtime action policy have separate meanings. Dataset review criteria alone
+do not establish runtime authorization.}
+
+Runtime explanations use the evidence saved at decision time. Household
+observation and user reactions later inform memory admission and future
+preparation. The exact admission and observation-result semantics are covered
+by the remaining cross-boundary decisions. \sourcecite{draft}

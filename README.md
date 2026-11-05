@@ -1,14 +1,11 @@
-# Settle_AI
+# SPIRA
 
-# Settle
-
-**Purchase-Aware Household Orchestration for Proactive Home Preparation**
+**SPIRA: Proactively Preparing Smart Homes via Retrieval-Augmented Purchase Intent Inference over Synthetic Knowledge**
 
 **Hanyang University · Fall 2026**  
 `CSE406` · `ITE351`
 
-
-## ITE 351: AI & Applications — Group Project Proposal
+## ITE 351 · AI & Applications — Group Project Proposal
 
 ### Team Members
 
@@ -21,65 +18,95 @@
 
 ### Research Idea
 
-**Title: Foundation-Model Synthetic Knowledge for Purchase-Intent Inference in Proactive Smart Homes**
+SPIRA uses synthetic purchase-intent cases as retrieval evidence for inferring why a household placed an order. A shared order and bounded household context, such as purchase-history signals and available calendar tags, are combined with similar cases from the knowledge base. The resulting intent and situation inform household preparation tasks.
 
-Online purchases can reflect household situations such as a birthday party, ordinary replenishment, or no special intent. However, real household purchase-intent data is difficult to obtain before deployment. We propose using multiple foundation models to construct a synthetic knowledge base of diverse household purchase cases, where each case jointly represents an order, household context, purchase intent, and situation. Rather than fixing a small intent taxonomy in advance, we will first generate broad cases, inspect their distribution, and organize recurring semantic patterns afterward. Generated cases will be filtered and cross-validated using models from different providers and sampled human review. At runtime, similar cases will be retrieved as evidence for an LLM that interprets a new order. We will compare retrieval-grounded inference against the same model without the synthetic knowledge base and evaluate intent/no-intent accuracy, bundle identification, consistency, and unsupported inference. The resulting AI component will be integrated with a separate software-engineering prototype that maps inferred situations to bounded smart-home actions.
+The planned knowledge pipeline uses foundation models to generate diverse purchase cases, cross-model review, and sampled human inspection. **OPEN** remains the choice between joint full-case generation and intent-seeded assembly. The shared meaning of confidence and ambiguity metadata also requires alignment. Synthetic cases support cold-start inference, while consented actual cases may later contribute evidence under the project's privacy policy.
 
-## CSE 406: Software Engineering — Settle
+The planned evaluation compares retrieval-grounded inference with the same model without synthetic knowledge retrieval. It examines intent/no-intent accuracy, relevant-item bundle identification, consistency, and unsupported inference. Ordinary replenishment and no special intent remain valid outcomes.
 
-The software engineering project treats one incoming order as the beginning of a bounded household episode. The current requirements define the responsibilities from order intake through context assembly, intent interpretation, household-task generation, execution, observation, and memory. The next work refines those responsibilities into implementation-level specifications and interfaces.
+## CSE 406 · Software Engineering — SPIRA
 
-### Conceptual Flow
+The software-engineering specification follows one shared order through inference, preparation, execution, observation, and household memory. Service sends versioned plans and tasks to Home. Home checks current execution eligibility, dispatches logical commands through simulator or physical-device connectors, and returns observable results.
+
+### End-to-End Flow
 
 ```text
-Shared Order
+Shared Order + Bounded Household Context
     -> Order Extraction / Item Structuring
-    -> Household Context Assembly
-    -> Retrieval from Purchase-Intent Knowledge Base
-    -> Intent / Situation Judgment
-    -> Household Task Generation
-    -> Plan and Notification
-    -> Home-Side Execution / Simulator
-    -> Execution Feedback and Observation
+    -> Retrieval from Synthetic Purchase-Intent Knowledge
+    -> Purchase-Intent / Situation Inference
+    -> Household Preparation Tasks
+    -> Versioned Plan and App Notification
+    -> Service-to-Home Execution Request
+    -> Home Eligibility Check
+    -> Simulator / Physical-Device Connector
+    -> Command Result, Readback, and Effect Evidence
+    -> Service Observation and User Feedback
     -> Household Memory
 ```
 
-### Main System Boundaries
+### System Responsibilities
 
-- **Purchase-Intent Knowledge Base:** population-level prior built from generated and reviewed order–intent–situation cases.
-- **Settle Service:** assembles context, retrieves similar cases, interprets intent, and generates bounded household tasks.
-- **Settle Home:** checks current device state and capability, executes permitted tasks, and returns command/readback results.
-- **App:** supports order sharing, notifications, action disable/stop controls, and explanation of what Settle is doing.
-- **Simulator / Devices:** exposes the same logical execution interface for the academic prototype, whether the appliance is simulated or physically connected.
+- **Knowledge Base** maintains allowed purchase-intent cases, labels, retrieval populations, and representative evidence.
+- **SPIRA Service** assembles inference context, retrieves evidence, infers intent, generates bounded tasks, and finalizes versioned plans.
+- **SPIRA Home** checks current household/device state and capability, evaluates applicable local triggers, executes eligible tasks, and reports readback, override, failure, and restoration outcomes.
+- **App** supports order sharing, plan notifications, decision-time explanations, whole-preparation stop, and per-task line-off controls.
+- **Simulator / Device Connector** exposes logical capabilities, command application, raw events, and observable state with explicit simulated or physical provenance.
+
+The proposed capability contract separates connector capability, current execution state, and product policy. Final ownership of derived local-event recognition and the detailed Home/core execution allocation remain **OPEN**.
+
+### B Specification v0.1
+
+The shared specification starts at [document/main.tex](document/main.tex), with six editable sections under [document/sections/](document/sections/). It covers scope and authority, knowledge and inference, shared planning objects, Home execution, observation and App behavior, safety/privacy, and open decisions. **OPEN** marks unresolved or conflicting source semantics. **PROPOSED** marks candidate closures awaiting team adoption.
+
+**B Specification v0.1 / team surface — not team-final and not professor-final submission structure.**
+
+The document uses a maintainable LaTeX `article` layout. The professor-required B hierarchy remains **OPEN**. The primary drafting source and historical product baseline are linked below. Settle 3.2 is retained as historical design provenance. [Team drafting surface](https://app.notion.com/p/40f0a6eaf42e8182a3d2c5bc7e900008), [historical product baseline](https://app.notion.com/p/40f0a6eaf42e80ada927f4f417435fa5)
+
+### Build the Specification
+
+The [compile workflow](.github/workflows/compile-spec.yml) runs on pushes and pull requests that change the document source or workflow. It compiles `document/main.tex` and uploads `main.pdf` as the **spira-specification** workflow artifact. Download the PDF from the corresponding GitHub Actions run.
+
+For a local build, install TeX Live with the LaTeX base, recommended, and extra packages, plus `latexmk`, then run from the repository root.
+
+```sh
+mkdir -p /tmp/spira-specification
+cd document
+latexmk -pdf -interaction=nonstopmode -halt-on-error \
+  -outdir=/tmp/spira-specification main.tex
+```
+
+The resulting PDF is `/tmp/spira-specification/main.pdf`. Local build output can remain outside the working tree. The CI build directory and TeX auxiliary files are ignored by Git.
 
 ## Representative Scenario
 
-The primary prototype scenario is a child's birthday party. An order containing party decorations, cupcake ingredients, drinks, and unrelated routine items is combined with calendar context. Settle should identify the relevant bundle, leave unrelated items outside the inferred situation, prepare feasible household tasks such as cleaning, bounded child-safety settings, atmosphere changes, and oven standby, and record what actually happened after execution.
+The primary demonstration target is a child's birthday party. An order containing party decorations, cupcake ingredients, and unrelated routine items is combined with calendar context. SPIRA should identify the relevant bundle, leave unrelated items outside the inferred situation, and propose feasible preparation such as cleaning, supported child-safety settings, atmosphere changes, and oven standby. Execution results record observable effects and their evidence limits.
 
-The scenario is a demonstration target, not a claim that every purchase should trigger automation.
+The specification also includes proposed boundary probes for first-guest arrival, light readback, and preservation of a later manual TV change during restoration. Runtime implementation and demonstration validation are upcoming work.
 
-## AI / Software Separation
+## AI and Execution Responsibilities
 
-Settle does not treat an LLM response as appliance authority.
+- LLMs may perform structured extraction, purchase-intent inference, and bounded task proposal.
+- Retrieval supplies representative purchase cases and decision-time evidence.
+- Code validates structure, supported capabilities, ranges, timing, and product-policy restrictions.
+- Home checks required current state before starting an effect and returns actual command/readback results. Missing required physical-state evidence blocks execution.
+- User stop and per-task line-off controls affect preparation. Direct user changes take precedence when automation ownership and restoration are evaluated.
+- Service interprets execution observations and explicit user reactions for household memory. Future task generation may use this household-specific feedback.
 
-- LLMs may perform structured extraction, semantic intent judgment, and task proposal.
-- Retrieval supplies similar cases as evidence rather than treating the nearest case as the answer.
-- Code validates schemas, device capabilities, supported ranges, and prohibited actions.
-- The home-side runtime checks current physical state before execution and reports results afterward.
-- User stop/disable controls remain available.
+The current runtime inference contract uses one-shot judgment with structural validation. **OPEN** remains whether evidence/confidence thresholds should become a runtime gate. Offline dataset-quality thresholds and runtime action policy require separate decisions.
 
-## Project Progress
+## Current Work and Open Decisions
 
-The project has completed its initial problem framing and requirements work and is currently moving into specification, data-pipeline prototyping, system-boundary definition, and implementation planning. Current work includes:
+This repository currently provides the B Specification source, README, and PDF build workflow. The next implementation work includes the knowledge pipeline, retrieval/inference contract, Service/Home/connector interfaces, App flow, and evaluation.
 
-- pilot generation and review of the purchase-intent knowledge base,
-- runtime intent-retrieval and judgment contracts,
-- service / home / simulator interfaces,
-- app and demonstration flow,
-- evaluation design for AI inference and end-to-end behavior.
+The specification keeps the following decisions visible for team discussion.
+
+- Synthetic case generation method and shared confidence/ambiguity semantics.
+- Runtime evidence gating and derived local-event ownership/versioning.
+- Stop, stale plan, in-flight command, reconnect, and restoration ordering.
+- Physical manual-change attribution and observation/memory terminal semantics.
+- Exact capability/schema fields, transport, host, camera, and sensor selection.
 
 ## Scope and Limitations
 
-Settle is an academic prototype. Synthetic data is used to explore cold-start knowledge construction and does not establish real household frequency or user preference. AI-generated labels and judgments require validation. Real LG appliance integration may be replaced by clearly labeled simulation where interfaces are unavailable. High-risk, irreversible, or money-spending actions are outside the intended autonomous-action scope.
-
-
+SPIRA is an academic prototype proposal. Synthetic data requires validation for inference quality and household applicability. Physical integrations depend on supported interfaces, and simulated behavior carries explicit provenance. Autonomous actions are bounded by product policy, capability, current-state checks, and user control. High-risk, irreversible, or money-spending operations are outside the intended autonomous-action scope.

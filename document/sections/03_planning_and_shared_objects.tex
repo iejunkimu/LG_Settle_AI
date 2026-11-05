@@ -1,0 +1,74 @@
+\section{Planning and Shared Objects}
+\label{sec:planning}
+
+\subsection{Task generation and plan finalization}
+
+Service derives preparation tasks from the inferred household need and the
+current household capability snapshot. Task generation identifies the need,
+maps it to supported logical device actions, assigns trigger/timing and an
+end condition, applies relevant household memory, runs deterministic
+planning/policy guards, and finalizes versioned tasks. Unsupported or
+product-prohibited tasks are removed before plan finalization.
+\sourcecite{draft}
+
+The baseline constrains generated actions through supported capabilities and
+guards on values, timing, and rooms. Money-spending and irreversible actions
+fall outside the intended autonomous-action scope. \sourcecite{baseline}
+
+\subsection{Plan and task meanings}
+
+A plan has an identity and version. A newer plan version supersedes older
+execution intent. Service and Home must share the following task meanings.
+\sourcecite{draft}
+
+{\small
+\begin{tabularx}{\textwidth}{@{}L{0.25\textwidth}Y@{}}
+\toprule
+\textbf{Meaning} & \textbf{Purpose} \\
+\midrule
+Plan identity & Associates the task with its plan or episode. \\
+Plan version & Identifies the revision and supports stale-execution prevention. \\
+Task identity & Correlates execution, cancellation, restoration, and results. \\
+Target & Identifies the logical household device or capability. \\
+Desired effect & States the requested household state or effect. \\
+Trigger & Specifies when the task becomes eligible. \\
+Deadline / validity & Bounds when a new execution can start. \\
+Preconditions & States physical conditions required before execution. \\
+End / restore policy & Determines how a temporary effect terminates or restores. \\
+\bottomrule
+\end{tabularx}
+\par
+}
+
+The table specifies interoperable meanings. Exact JSON names, enum spellings,
+and transport bindings remain open. \sourcecite{draft}
+
+\subsection{Capability, current state, and product policy}
+
+\proposed{Separate the current catalog into connector capability, current
+Home state, and Service/shared product policy. Planning consumes a
+Home-provided capability snapshot. Home revalidates current capability and
+state when execution becomes eligible.}
+
+{\small
+\begin{tabularx}{\textwidth}{@{}L{0.25\textwidth}Y@{}}
+\toprule
+\textbf{Boundary} & \textbf{Meaning} \\
+\midrule
+Home / connector capability & Supported logical commands, value ranges and
+units, readable state, raw events, verification support, and manual-change
+attribution support. \\
+Home runtime state & Current reachability, observed state, observable use or
+conflict, provenance, and observation freshness. \\
+Service/shared policy & Permitted actions, timing/context restrictions,
+quiet/noisy treatment, user-visible preparation, and protected operations. \\
+\bottomrule
+\end{tabularx}
+\par
+}
+
+Within this proposal, unsupported capability means the connector cannot
+perform an operation. Product-prohibited use means policy excludes an otherwise
+possible operation. Temporary unavailability means a normally supported
+operation cannot execute now. These distinctions preserve the reason a task
+cannot proceed. Exact status names remain open. \sourcecite{draft}\sourcecite{capability}

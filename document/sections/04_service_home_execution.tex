@@ -1,0 +1,47 @@
+\section{Service, Home, and observable execution}
+\label{sec:execution}
+
+\subsection{Execution request and local authority}
+
+Service sends a versioned logical plan with tasks, desired effects, activation conditions, validity, preconditions, and end or restore policy. Home compares the request with current household evidence, dispatches supported logical commands, and returns attributable results. Semantic task selection remains with Service. An unsupported request requires a reported reason and a new Service decision before an alternative effect can be pursued. \sourcecite{draft}
+
+\open{Execution placement. The provisional Home checkpoint reports both Home-side execution and a central \texttt{core/execute} allocation in current subsystem descriptions. Their final division requires team reconciliation.} \sourcecite{home}
+
+\proposed{Home boundary refinement. Home performs the execution-time checks below using connector-visible state and evidence. This allocation incorporates a provisional Home checkpoint and remains subject to the execution-placement decision.}
+
+Before dispatch, Home checks that the plan version is current, the task is enabled, its validity has begun and its deadline has not passed, the capability is currently available, required preconditions are observable and satisfied, and direct user control permits the effect. An unknown required physical condition blocks execution with its reason. Fresh device or simulator readback supplies current-state evidence. A planning snapshot supplies context for planning. \sourcecite{home}
+
+\subsection{Raw events and trigger evaluation}
+
+A doorbell press or doorlock opening is a raw observation. Recognizing a first guest requires an agreed rule relating observations to a household event.
+
+\proposed{Shared local-event vocabulary. A shared, versioned contract defines reusable local-event rules. Service selects the rule and plan-level validity for a task. Home evaluates that rule against local observations. Connectors expose raw events and state with provenance. A rule reference such as \texttt{first\_guest\_arrival.v1} illustrates this proposal.}
+
+\open{Derived-event allocation. The provisional Home checkpoint reports core-derived events in Simulator/DATA descriptions and Home/Hub-derived events in Server descriptions. Rule ownership, correlation windows, duplicate-event identity, and version compatibility require agreement.} \sourcecite{draft}\sourcecite{home}
+
+\subsection{Connector and evidence contract}
+
+Simulator and physical integrations share a logical connector boundary covering supported commands, current state/readback, command results, raw events, provenance, verification support, and failure or unavailability. Each connector declares its applicable subset and evidence limits. \sourcecite{draft}
+
+\proposed{Capability allocation. Home/connector supplies physical capability and current-state truth. Service/shared product policy defines permitted uses and restrictions. Planning consumes a capability snapshot and execution revalidates it locally. Unsupported capability, product-prohibited use, and temporary unavailability need distinct meanings.} \sourcecite{capability}
+
+Command request, command acceptance, observed effect, and verification represent separate stages. Verification compares available post-command evidence with the desired effect. Simulator state must support rejection, delayed effects, mismatch, unavailable readback, and external changes independently of the requested plan. A physical connector's weaker observations remain visible in the result. \sourcecite{draft}
+
+\proposed{Effect evidence vocabulary. Candidate terms distinguish the following outcomes.}
+\begin{itemize}
+\item \texttt{VERIFIED} records a matching observation.
+\item \texttt{MISMATCH} records a conflicting observation.
+\item \texttt{UNVERIFIABLE} records insufficient effect evidence.
+\item \texttt{COMMAND\_FAILED} records command failure or rejection.
+\end{itemize}
+Exact fields and enum names remain OPEN. \sourcecite{draft}\sourcecite{home}
+
+The result correlates with plan identity/version and task identity. It preserves execution and command disposition, observed state and evidence time, provenance, effect evidence, override, restore outcome, and block/failure reason when applicable. Service retains late results with their original identity while applying current-plan updates only to the appropriate version. \sourcecite{draft}
+
+\subsection{User control and temporary effects}
+
+Direct user manipulation outranks automatic ownership. Once a user change to an automated property is observed, ownership of that effect is lost. The same task stays suppressed and restore preserves the user's state. Temporary effects may retain their pre-execution state and later report restored, skipped for user override, or failed/unavailable. \sourcecite{draft}
+
+Stop or cancellation observed before dispatch blocks new effects. A command already delivered to a device requires reporting of its actual outcome. Readback and necessary restoration may continue after the execution deadline. \sourcecite{draft}\sourcecite{home}
+
+\open{Control ordering and recovery. Stop, supersession, in-flight completion, restore, and reconnect require a shared ordering contract. Retry identity, partial multi-device results, and physical manual-change attribution also remain unresolved.}

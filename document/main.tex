@@ -1,0 +1,111 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=24mm,headheight=14pt]{geometry}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{bookmark}
+
+\definecolor{linkblue}{HTML}{164B70}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=linkblue,
+  urlcolor=linkblue,
+  pdftitle={SPIRA: Proactively Preparing Smart Homes via Retrieval-Augmented Purchase Intent Inference over Synthetic Knowledge},
+  pdfauthor={Hanyang University SPIRA Team},
+  pdfsubject={B Specification v0.1 / team surface}
+}
+\urlstyle{same}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{2em}
+\setlist{nosep,leftmargin=*}
+\setlist[description]{font=\normalfont\bfseries,style=nextline}
+\renewcommand{\arraystretch}{1.15}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small SPIRA \textbar\ B Specification}
+\fancyhead[R]{\small v0.1 \textbar\ Team review draft}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\newcommand{\open}[1]{\textbf{OPEN.} #1}
+\newcommand{\proposed}[1]{\textbf{PROPOSED.} #1}
+\newcommand{\sourcecite}[1]{\textsuperscript{\hyperref[source:#1]{[#1]}}}
+
+\title{\large B Specification v0.1 / team surface\\[8pt]
+  \LARGE\bfseries SPIRA: Proactively Preparing Smart Homes via Retrieval-Augmented Purchase Intent Inference over Synthetic Knowledge}
+\author{Hanyang University \textbar\ Fall 2026\\
+  CSE406 Software Engineering \textbar\ ITE351 AI \& Applications}
+\date{6 November 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\textbf{Document status.} This integrated working specification supports team
+discussion of responsibilities and shared contracts. Team approval and the
+professor-required B submission hierarchy remain open. The simple
+\texttt{article} format is an editorial choice for a maintainable shared source.
+
+Aligned semantics from the current team draft appear as ordinary prose.
+\textbf{OPEN} marks source conflicts or missing decisions.
+\textbf{PROPOSED} marks candidate closures from Home-side discussion and analysis.
+Logical contract meanings guide integration while exact schemas and deployment
+choices await team decisions.\sourcecite{draft}\sourcecite{commission}
+
+The current project name is SPIRA. The full title above follows the user's
+6 November naming decision. Settle 3.2 is retained as historical design
+provenance for the current product baseline.\sourcecite{baseline}
+
+\input{sections/01_scope_and_flow}
+\input{sections/02_knowledge_and_inference}
+\input{sections/03_planning_and_shared_objects}
+\input{sections/04_service_home_execution}
+\input{sections/05_observation_app_safety_privacy}
+\input{sections/06_open_decisions}
+
+\section*{Source register}
+\addcontentsline{toc}{section}{Source register}
+The sources below preserve the drafting basis and proposal status. Their
+source revisions are dated 5 November 2026 UTC and were retrieved on
+6 November 2026 KST. The current user title takes precedence over the earlier
+naming in these sources.
+
+\begin{description}[font=\normalfont\bfseries]
+  \item[{[draft]}]\phantomsection\label{source:draft}
+  Primary drafting source, \emph{SPIRA B Specification v0.1 / Team Surface}.
+  Draft team surface with explicit OPEN and PROPOSED decisions.
+  \href{https://app.notion.com/p/40f0a6eaf42e8182a3d2c5bc7e900008}{Notion source}.
+
+  \item[{[baseline]}]\phantomsection\label{source:baseline}
+  \emph{Settle 3.2}, the historical product baseline used by the current draft.
+  \href{https://app.notion.com/p/40f0a6eaf42e80ada927f4f417435fa5}{Notion source}.
+
+  \item[{[home]}]\phantomsection\label{source:home}
+  \emph{Home Specification Boundary / provisional v0}.
+  Home-side working checkpoint awaiting cross-component team reconciliation.
+  \href{https://app.notion.com/p/40f0a6eaf42e81919cd5d8604b8d541c}{Notion source}.
+
+  \item[{[capability]}]\phantomsection\label{source:capability}
+  \emph{Home capability ownership / proposed}.
+  Candidate separation of connector capability, current state, and product policy.
+  \href{https://app.notion.com/p/40f0a6eaf42e8103912ed497cc0e063d}{Notion source}.
+
+  \item[{[commission]}]\phantomsection\label{source:commission}
+  \emph{SPIRA B v0.1 LaTeX + README migration}.
+  Delivery scope and review discipline for this shared artifact.
+  \href{https://app.notion.com/p/40f0a6eaf42e81408459ce583a60245e}{Notion commission}.
+\end{description}
+
+\end{document}

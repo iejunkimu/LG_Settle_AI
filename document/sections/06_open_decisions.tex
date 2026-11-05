@@ -1,0 +1,37 @@
+\section{Open decisions and implementation probes}
+\label{sec:open}
+
+\subsection{Team decision register}
+
+The following register preserves conflicts and unresolved contracts carried by the primary team draft and provisional Home inputs. Proposed refinements remain available for team review. \sourcecite{draft}\sourcecite{home}\sourcecite{capability}
+
+\begin{tabularx}{\linewidth}{@{}L{0.075\linewidth}Y@{}}
+\toprule
+ID & Decision requiring closure \\
+\midrule
+O1 & \textbf{OPEN} Synthetic generation method. Joint full-case generation and intent-seeded assembly conflict. \\
+O2 & \textbf{OPEN} Confidence/ambiguity receiver semantics. Define which generation metadata reaches the shared runtime case and how Service interprets it. \\
+O3 & \textbf{OPEN} Runtime evidence policy. Decide whether an execution gate is adopted separately from offline quality thresholds. \\
+O4 & \textbf{OPEN} Derived-event ownership and Home/core execution allocation. Reconcile current source projections and the shared-rule proposal. \\
+O5 & \textbf{OPEN} Control ordering. Specify stop, stale versions, in-flight commands, restoration, reconnect, retry identity, and partial results. \\
+O6 & \textbf{OPEN} Physical manual-change attribution. Determine supported evidence and behavior when origin is unknown. \\
+O7 & \textbf{OPEN} Capability and result schemas. Agree exact fields, enums, evidence freshness, verification support, and inventory consumption. \\
+O8 & \textbf{OPEN} Observation and memory closure. Define terminal states, late/incomplete windows, admission, and retention. \\
+O9 & \textbf{OPEN} App reaction identity and ordering across later actions on the same card. \\
+O10 & \textbf{OPEN} Concrete transport, deployment, host, physical connectors, camera/sensor hardware, and privacy/deletion policy. \\
+O11 & \textbf{OPEN} Professor-required B hierarchy. Current evidence establishes a Specification document while leaving its detailed mandatory structure unknown. \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Small implementation probes}
+
+\proposed{The following probes can test the shared contracts during implementation. They are scenario-derived validation candidates.}
+
+\begin{enumerate}
+\item A connector smoke test requests a kettle plug transition from on to off and checks independent off readback.
+\item A first-guest probe supplies raw doorbell and doorlock events, evaluates the agreed rule, checks task eligibility, requests living-room pink lighting, and returns effect evidence from independent simulator state.
+\item A negative verification probe accepts a command while retaining the previous simulator state. Readback must expose the mismatch.
+\item A manual-TV-off probe applies an atmosphere task, supplies a later user-originated off event, and checks ownership loss and skipped restore with an explicit reason.
+\end{enumerate}
+
+These probes leave the event rule, concrete connector schema, hardware, and transport subject to the decisions above. Their specification records intended checks. Execution and results belong to later implementation work. \sourcecite{draft}\sourcecite{home}

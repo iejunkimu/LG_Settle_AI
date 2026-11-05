@@ -1,0 +1,66 @@
+\section{System Scope and End-to-End Flow}
+\label{sec:scope}
+
+SPIRA uses a shared purchase order and bounded household context to infer
+purchase intent, generate relevant preparation tasks, and connect those tasks
+to observable household results. Synthetic purchase-intent cases provide
+retrieval evidence for runtime inference. Execution and user feedback then
+contribute to household memory. \sourcecite{draft}
+
+\subsection{Episode flow}
+
+\begin{center}
+\small
+Shared order $\rightarrow$ item extraction and structuring\\[2pt]
+$\rightarrow$ bounded context assembly and knowledge retrieval\\[2pt]
+$\rightarrow$ purchase-intent inference $\rightarrow$ task generation\\[2pt]
+$\rightarrow$ versioned plan and notification $\rightarrow$ Home execution\\[2pt]
+$\rightarrow$ device/simulator observation and feedback\\[2pt]
+$\rightarrow$ household memory
+\end{center}
+
+An order can support a household situation, ordinary replenishment, or no
+special intent. Empty preparation is a valid outcome. In a mixed order,
+unrelated items remain outside the inferred situation. The current baseline
+supports device-state adjustment, bounded delivered-item care, environmental
+preparation, and selected loss-prevention notices or refrigerator-screen
+guidance. Autonomous preparation is bounded by capability and product policy.
+\sourcecite{baseline}
+
+\subsection{Participants and authority}
+
+{\small
+\begin{tabularx}{\textwidth}{@{}L{0.23\textwidth}Y@{}}
+\toprule
+\textbf{Participant} & \textbf{Responsibility and authority} \\
+\midrule
+Knowledge Base & Maintains synthetic and permitted actual purchase-intent
+cases, labels, embeddings, and the retrieval population. \\
+Service & Processes orders, assembles inference context, retrieves evidence,
+infers intent, generates tasks, and finalizes plans and app-facing results.
+It decides the intended preparation and its rationale. \\
+App & Shares orders and displays the current plan, rationale, results, and
+user stop or line-off controls. \\
+Home & Checks current household/device truth and execution eligibility,
+evaluates local triggers, dispatches commands, obtains readback, and handles
+user override and restoration. \\
+Simulator / Device Connector & Exposes connector-visible state, raw events,
+command application, and observable results with their provenance. \\
+\bottomrule
+\end{tabularx}
+\par
+}
+
+Service uses Home results to interpret what actually occurred. The Knowledge
+Base supplies inference evidence, while device command authority remains at
+the execution boundary. \sourcecite{draft}
+
+\subsection{Birthday-party reference episode}
+
+The current scenario combines a Saturday birthday calendar entry with a mixed
+order containing princess-party supplies, cupcake ingredients, strawberries,
+and routine items. Relevant preparation can include cleaning, supported child
+safety settings, party atmosphere, oven standby, and strawberry guidance.
+The App presents one preparation card with stop and per-task line-off controls.
+Device integration assumptions remain subject to available connectors or
+explicitly identified simulation. \sourcecite{baseline}

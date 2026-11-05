@@ -1,0 +1,26 @@
+\section{Observation, App interaction, safety, and privacy}
+\label{sec:observation}
+
+\subsection{Observation and household memory}
+
+Home supplies local event and execution evidence. Service interprets household-level observations and decides which evidence enters memory. Observation distinguishes actual device results, unavailable evidence, direct user intervention, explicit stop or line-off reactions, and changes initiated by SPIRA. Memory can affect later task generation and gating. Consented, generalized other-home cases may contribute to the shared purchase-intent corpus. \sourcecite{draft}
+
+The birthday scenario includes later appliance use as feedback for the inferred situation. Interpretation must preserve the evidence source and the distinction between an observed action and its household meaning. \open{Observation closure. The observation-result schema, late or incomplete windows, terminal memory states, and admission rules require agreement before these examples become executable contracts.} \sourcecite{draft}\sourcecite{baseline}
+
+\subsection{App and user reaction}
+
+After order sharing, App presents the inferred intent, plan/task summary, decision-time rationale, and available execution or observation results. The preparation card provides \emph{stop} for preparation associated with the intent and \emph{line-off} for an individual task while retaining the intent. Explanations use the evidence stored at judgment time, allowing the App to display the original rationale without another inference call. \sourcecite{draft}
+
+\open{Reaction identity and ordering. Multiple distinct reactions on the same card need correlation with the relevant plan/task version and an agreed ordering rule. Control delivery and its observed execution consequences must be reconciled across App, Service, and Home.}
+
+\subsection{Safety and failure behavior}
+
+Deterministic planning checks remove unsupported and prohibited operations. Local execution checks current availability and required physical conditions. Execution results expose failed commands, conflicting readback, unavailable evidence, and user override. This supports truthful App reporting and later interpretation. High-risk, irreversible, or money-spending autonomous operations remain outside the current product scope. \sourcecite{draft}\sourcecite{baseline}
+
+Stale plan versions are ineligible for new execution. The connector's available readback bounds any effect claim. Where provenance is unavailable, manual-change attribution remains unknown until the team specifies a supported policy. \sourcecite{draft}\sourcecite{home}
+
+\subsection{Bounded data handling}
+
+The current privacy direction limits raw order-image handling to required processing followed by deletion, restricts raw calendar and sensitive text, and bounds household/device event retention. Sharing generalized other-home cases requires consent. Camera observation is limited to explicitly selected household events with bounded capture and use. \sourcecite{draft}
+
+\open{Privacy implementation. Retention periods, deletion propagation, consent handling, observation locality, and the final camera/sensor deployment require a concrete policy. The source establishes direction while leaving these operational details incomplete.}

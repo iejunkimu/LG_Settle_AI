@@ -1,85 +1,68 @@
-# Settle_AI
+# SPIRA
 
-# Settle
+**Proactively Preparing Smart Homes via Retrieval-Augmented Purchase Intent Inference over Synthetic Knowledge**
 
-**Purchase-Aware Household Orchestration for Proactive Home Preparation**
+Hanyang University, Fall 2026<br>
+`CSE406 Software Engineering` · `ITE351 AI & Applications`
 
-**Hanyang University · Fall 2026**  
-`CSE406` · `ITE351`
+## Current document
 
+This repository contains the current CSE406 Submission A+B paper and its LaTeX source.
 
-## ITE 351: AI & Applications — Group Project Proposal
+- [Submission PDF](document/main.pdf)
+- [LaTeX source](document/main.tex)
 
-### Team Members
+The paper retains the submitted A requirements and adds the Submission B development environment and specifications in one IEEE document:
 
-| **Name** | **Organization** | **Email** |
-| --- | --- | --- |
-| Jeewon Lee | Department of Information Systems, Hanyang University | leejeewon916@gmail.com |
-| Uijin Lee | Department of Information Systems, Department of Food & Nutrition Hanyang University | smilelejn@gmail.com |
-| Seojin Lee | Department of Information Systems, Hanyang University | leeseojini0303@gmail.com |
-| Yejoon Kim | Department of Information Systems, Hanyang University | yejoonkim1340@gmail.com |
+1. Introduction
+2. Requirements
+3. Development Environment
+4. Specifications
+5. References
 
-### Research Idea
+## Project overview
 
-**Title: Foundation-Model Synthetic Knowledge for Purchase-Intent Inference in Proactive Smart Homes**
-
-Online purchases can reflect household situations such as a birthday party, ordinary replenishment, or no special intent. However, real household purchase-intent data is difficult to obtain before deployment. We propose using multiple foundation models to construct a synthetic knowledge base of diverse household purchase cases, where each case jointly represents an order, household context, purchase intent, and situation. Rather than fixing a small intent taxonomy in advance, we will first generate broad cases, inspect their distribution, and organize recurring semantic patterns afterward. Generated cases will be filtered and cross-validated using models from different providers and sampled human review. At runtime, similar cases will be retrieved as evidence for an LLM that interprets a new order. We will compare retrieval-grounded inference against the same model without the synthetic knowledge base and evaluate intent/no-intent accuracy, bundle identification, consistency, and unsupported inference. The resulting AI component will be integrated with a separate software-engineering prototype that maps inferred situations to bounded smart-home actions.
-
-## CSE 406: Software Engineering — Settle
-
-The software engineering project treats one incoming order as the beginning of a bounded household episode. The current requirements define the responsibilities from order intake through context assembly, intent interpretation, household-task generation, execution, observation, and memory. The next work refines those responsibilities into implementation-level specifications and interfaces.
-
-### Conceptual Flow
+SPIRA connects a user-shared order to bounded household preparation. It retrieves reviewed synthetic purchase-intent cases, interprets a possible household situation, validates proposed preparation with deterministic rules, notifies the user, and delegates eligible execution to the home-side runtime. Observed results and explicit user reactions are recorded separately from future execution permission.
 
 ```text
-Shared Order
-    -> Order Extraction / Item Structuring
-    -> Household Context Assembly
-    -> Retrieval from Purchase-Intent Knowledge Base
-    -> Intent / Situation Judgment
-    -> Household Task Generation
-    -> Plan and Notification
-    -> Home-Side Execution / Simulator
-    -> Execution Feedback and Observation
-    -> Household Memory
+Shared Order and Context
+    -> Synthetic Purchase-Intent Retrieval
+    -> Intent or No-Intent Judgment
+    -> Deterministic Eligibility and Plan Validation
+    -> Notification and User Controls
+    -> Home-Side Trigger, Execution, and Readback
+    -> Observed Result and Household Memory
 ```
 
-### Main System Boundaries
+The representative scenario is a child's birthday party. The prototype distinguishes relevant party items from unrelated purchases, proposes only supported household tasks, and labels simulated and physical device paths explicitly.
 
-- **Purchase-Intent Knowledge Base:** population-level prior built from generated and reviewed order–intent–situation cases.
-- **Settle Service:** assembles context, retrieves similar cases, interprets intent, and generates bounded household tasks.
-- **Settle Home:** checks current device state and capability, executes permitted tasks, and returns command/readback results.
-- **App:** supports order sharing, notifications, action disable/stop controls, and explanation of what Settle is doing.
-- **Simulator / Devices:** exposes the same logical execution interface for the academic prototype, whether the appliance is simulated or physically connected.
+## Responsibility boundaries
 
-## Representative Scenario
+- **Knowledge Retrieval:** constructs, reviews, embeds, and retrieves synthetic purchase-intent cases.
+- **SPIRA Service:** interprets intent, derives household needs, validates and versions plans, prepares explanations, and updates memory.
+- **App:** supports order sharing, notification, explanation, `STOP ALL`, and per-task disable controls.
+- **Home:** revalidates current capability and physical state, evaluates local triggers, dispatches commands, reads results, and handles override or restoration.
+- **Simulator / Physical Devices:** expose capabilities, events, independently maintained state, and observable effects.
 
-The primary prototype scenario is a child's birthday party. An order containing party decorations, cupcake ingredients, drinks, and unrelated routine items is combined with calendar context. Settle should identify the relevant bundle, leave unrelated items outside the inferred situation, prepare feasible household tasks such as cleaning, bounded child-safety settings, atmosphere changes, and oven standby, and record what actually happened after execution.
+An LLM response never authorizes a physical action by itself. Product policy, capability constraints, current state, user intervention, and prohibited-action rules remain deterministic checks.
 
-The scenario is a demonstration target, not a claim that every purchase should trigger automation.
+## Development baseline
 
-## AI / Software Separation
+The paper specifies the current prototype baseline: Python 3.12 for retrieval, Service, Home logic, and simulation; Flutter 3.47.5 for the App; PostgreSQL 16 with pgvector for persistent data and retrieval; and an existing Galaxy S10 5G as the Home prototype substrate. The development workstation and estimated incremental cost are recorded in Section III.
 
-Settle does not treat an LLM response as appliance authority.
+## Build
 
-- LLMs may perform structured extraction, semantic intent judgment, and task proposal.
-- Retrieval supplies similar cases as evidence rather than treating the nearest case as the answer.
-- Code validates schemas, device capabilities, supported ranges, and prohibited actions.
-- The home-side runtime checks current physical state before execution and reports results afterward.
-- User stop/disable controls remain available.
+The repository includes `document/IEEEtran.cls`. From the `document` directory, compile with Tectonic:
 
-## Project Progress
+```bash
+tectonic -X compile main.tex
+```
 
-The project has completed its initial problem framing and requirements work and is currently moving into specification, data-pipeline prototyping, system-boundary definition, and implementation planning. Current work includes:
+## Team
 
-- pilot generation and review of the purchase-intent knowledge base,
-- runtime intent-retrieval and judgment contracts,
-- service / home / simulator interfaces,
-- app and demonstration flow,
-- evaluation design for AI inference and end-to-end behavior.
-
-## Scope and Limitations
-
-Settle is an academic prototype. Synthetic data is used to explore cold-start knowledge construction and does not establish real household frequency or user preference. AI-generated labels and judgments require validation. Real LG appliance integration may be replaced by clearly labeled simulation where interfaces are unavailable. High-risk, irreversible, or money-spending actions are outside the intended autonomous-action scope.
-
-
+| Name | Responsibility |
+| --- | --- |
+| Jeewon Lee | Development management and submission integration |
+| Uijin Lee | User evaluation and synthetic purchase-intent cases |
+| Seojin Lee | Customer scope and requirement review |
+| Yejoon Kim | Service, model integration, device adapters, and tests |
